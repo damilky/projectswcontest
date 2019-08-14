@@ -44,7 +44,7 @@ logger.addHandler(ch)
 mplset = False
 
 
-class CocoMetadata:
+class CocoMetadata: #경계선
     # __coco_parts = 57
     __coco_parts = 19
     __coco_vecs = list(zip(
@@ -72,7 +72,7 @@ class CocoMetadata:
         self.width = int(img_meta['width'])
 
         joint_list = []
-        for ann in annotations:
+        for ann in annotations: #사람 박스
             if ann.get('num_keypoints', 0) == 0:
                 continue
 

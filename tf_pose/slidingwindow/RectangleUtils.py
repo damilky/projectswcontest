@@ -16,7 +16,7 @@ def cropRect(rect, cropTop, cropBottom, cropLeft, cropRight):
 	y += cropTop
 	w -= (cropLeft + cropRight)
 	h -= (cropTop + cropBottom)
-	
+	print(x,y,w,h)
 	# Re-pack the padded rect
 	return (x,y,w,h)
 

@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
-
+from pprint import pprint as pp
 logger = logging.getLogger('TfPoseEstimatorRun')
 logger.handlers.clear()
 logger.setLevel(logging.DEBUG)
@@ -46,6 +46,8 @@ if __name__ == '__main__':
 
     t = time.time()
     humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)
+    pp(humans.body_parts)
+
     elapsed = time.time() - t
 
     logger.info('inference image: %s in %.4f seconds.' % (args.image, elapsed))

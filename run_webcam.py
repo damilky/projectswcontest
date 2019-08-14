@@ -1,13 +1,12 @@
 import argparse
 import logging
 import time
-
+from tf_pose import common
 import cv2
 import numpy as np
-
+from pprint import pprint as pp
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
-
 logger = logging.getLogger('TfPoseEstimator-WebCam')
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
@@ -41,6 +40,8 @@ if __name__ == '__main__':
 
     logger.debug('initialization %s : %s' % (args.model, get_graph_path(args.model)))
     w, h = model_wh(args.resize)
+
+
     if w > 0 and h > 0:
         e = TfPoseEstimator(get_graph_path(args.model), target_size=(w, h), trt_bool=str2bool(args.tensorrt))
     else:
@@ -49,9 +50,20 @@ if __name__ == '__main__':
     cam = cv2.VideoCapture(args.camera)
     ret_val, image = cam.read()
     logger.info('cam image=%dx%d' % (image.shape[1], image.shape[0]))
+    flag = True
 
     while True:
-        ret_val, image = cam.read()
+        if (flag == True):
+
+                humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)
+                pp(humans)
+                image2 = common.read_imgfile("black.jpg",(701,768))
+                image2 = TfPoseEstimator.draw_humans(image2, humans, imgcopy=False)
+                cv2.imshow("asdf",image2)
+                print(w, h)  # 이거 사이즈 안변하는거같음 걍 화면크기?
+                ret_val, image = cam.read()
+                #flag =False
+                #cv2.waitKey(0)
 
         logger.debug('image process+')
         humans = e.inference(image, resize_to_default=(w > 0 and h > 0), upsample_size=args.resize_out_ratio)

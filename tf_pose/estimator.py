@@ -308,8 +308,8 @@ class TfPoseEstimator:
 
         # load graph
         logger.info('loading graph from %s(default size=%dx%d)' % (graph_path, target_size[0], target_size[1]))
-        with tf.gfile.GFile(graph_path, 'rb') as f:
-            graph_def = tf.GraphDef()
+        with tf.io.gfile.GFile(graph_path, 'rb') as f:
+            graph_def = tf.compat.v1.GraphDef()
             graph_def.ParseFromString(f.read())
 
         if trt_bool is True:
@@ -338,8 +338,8 @@ class TfPoseEstimator:
         self.tensor_output = self.graph.get_tensor_by_name('TfPoseEstimator/Openpose/concat_stage7:0')
         self.tensor_heatMat = self.tensor_output[:, :, :, :19]
         self.tensor_pafMat = self.tensor_output[:, :, :, 19:]
-        self.upsample_size = tf.placeholder(dtype=tf.int32, shape=(2,), name='upsample_size')
-        self.tensor_heatMat_up = tf.image.resize_area(self.tensor_output[:, :, :, :19], self.upsample_size,
+        self.upsample_size = tf.compat.v1.placeholder(dtype=tf.int32, shape=(2,), name='upsample_size')
+        self.tensor_heatMat_up = tf.compat.v1.image.resize_area(self.tensor_output[:, :, :, :19], self.upsample_size,
                                                       align_corners=False, name='upsample_heatmat')
         self.tensor_pafMat_up = tf.image.resize_area(self.tensor_output[:, :, :, 19:], self.upsample_size,
                                                      align_corners=False, name='upsample_pafmat')
@@ -408,7 +408,8 @@ class TfPoseEstimator:
     def draw_humans(npimg, humans, imgcopy=False):
         if imgcopy:
             npimg = np.copy(npimg)
-        image_h, image_w = npimg.shape[:2]
+        image_h, image_w = 720,1280
+        #image_h, image_w = npimg.shape[:2]
         centers = {}
         for human in humans:
             # draw point
@@ -419,7 +420,7 @@ class TfPoseEstimator:
                 body_part = human.body_parts[i]
                 center = (int(body_part.x * image_w + 0.5), int(body_part.y * image_h + 0.5))
                 centers[i] = center
-                cv2.circle(npimg, center, 3, common.CocoColors[i], thickness=3, lineType=8, shift=0)
+                cv2.circle(npimg, center, 5,   common.CocoColors[i], thickness=3, lineType=8, shift=0)#원크기
 
             # draw line
             for pair_order, pair in enumerate(common.CocoPairsRender):
